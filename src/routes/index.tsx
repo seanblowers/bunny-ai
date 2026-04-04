@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Send, Square } from 'lucide-react'
 import { useAIChat } from '@/lib/ai-hook'
+
+function hasCupcakKeMention(text: string): boolean {
+  return /cupcakke/i.test(text)
+}
 
 function BunnyAvatar() {
   return (
@@ -65,7 +69,7 @@ function Messages({ messages }: { messages: Array<{ id: string; role: string; pa
           return (
             <div
               key={message.id}
-              className={`flex items-end gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+              className={`flex items-end gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'} ${message.role === 'assistant' && hasCupcakKeMention(textContent) ? 'bunny-wild' : ''}`}
             >
               {message.role === 'assistant' ? (
                 <BunnyAvatar />
@@ -90,15 +94,27 @@ function Home() {
   const chat = useAIChat()
   const isStreaming = chat.status === 'streaming'
 
+  const isCupcakKeMode = useMemo(() => {
+    return chat.messages.some((m: any) => {
+      const text = m.parts
+        ?.filter((p: any) => p.type === 'text')
+        .map((p: any) => p.content)
+        .join('') || ''
+      return hasCupcakKeMention(text)
+    })
+  }, [chat.messages])
+
   return (
     <div className="chat-container">
       {/* Header */}
-      <div className="chat-header">
+      <div className={`chat-header ${isCupcakKeMode ? 'bunny-wild' : ''}`}>
         <BunnyAvatar />
         <div className="chat-header-info">
           <h1 className="chat-header-name">Bun Bun</h1>
           <span className="chat-header-status">
-            {isStreaming ? 'thumping...' : 'online • munching hay'}
+            {isCupcakKeMode
+              ? '🎵 CUPCAKKE MODE • going absolutely feral 🎵'
+              : isStreaming ? 'thumping...' : 'online • munching hay'}
           </span>
         </div>
       </div>
@@ -107,7 +123,7 @@ function Home() {
       <div className="chat-messages-area">
         {chat.messages.length === 0 && (
           <div className="chat-empty-state">
-            <div className="chat-empty-bunny">
+            <div className={`chat-empty-bunny ${hasCupcakKeMention(input) ? 'bunny-wild-idle' : ''}`}>
               <svg viewBox="0 0 64 64" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="22" cy="14" rx="7" ry="14" fill="#fce4ec" stroke="#f8bbd0" strokeWidth="1.5" />
                 <ellipse cx="22" cy="14" rx="4" ry="10" fill="#f8bbd0" />
