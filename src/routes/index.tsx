@@ -7,6 +7,10 @@ function hasCupcakKeMention(text: string): boolean {
   return /cupcakke/i.test(text)
 }
 
+function hasTaylorLikesMention(text: string): boolean {
+  return /taylor\s+likes/i.test(text)
+}
+
 function BunnyAvatar() {
   return (
     <div className="bunny-avatar">
@@ -40,7 +44,45 @@ function BunnyAvatar() {
   )
 }
 
-function Messages({ messages }: { messages: Array<{ id: string; role: string; parts: Array<{ type: string; content?: string }> }> }) {
+function ButterflyAvatar() {
+  return (
+    <div className="butterfly-avatar">
+      <svg viewBox="0 0 64 64" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+        {/* Left upper wing */}
+        <ellipse cx="18" cy="22" rx="14" ry="12" fill="#c084fc" stroke="#a855f7" strokeWidth="1" transform="rotate(-15 18 22)" />
+        <ellipse cx="18" cy="22" rx="9" ry="7" fill="#e9d5ff" transform="rotate(-15 18 22)" />
+        {/* Right upper wing */}
+        <ellipse cx="46" cy="22" rx="14" ry="12" fill="#c084fc" stroke="#a855f7" strokeWidth="1" transform="rotate(15 46 22)" />
+        <ellipse cx="46" cy="22" rx="9" ry="7" fill="#e9d5ff" transform="rotate(15 46 22)" />
+        {/* Left lower wing */}
+        <ellipse cx="20" cy="40" rx="11" ry="9" fill="#f0abfc" stroke="#d946ef" strokeWidth="1" transform="rotate(-10 20 40)" />
+        <ellipse cx="20" cy="40" rx="6" ry="5" fill="#fae8ff" transform="rotate(-10 20 40)" />
+        {/* Right lower wing */}
+        <ellipse cx="44" cy="40" rx="11" ry="9" fill="#f0abfc" stroke="#d946ef" strokeWidth="1" transform="rotate(10 44 40)" />
+        <ellipse cx="44" cy="40" rx="6" ry="5" fill="#fae8ff" transform="rotate(10 44 40)" />
+        {/* Body */}
+        <ellipse cx="32" cy="32" rx="3" ry="14" fill="#7c3aed" />
+        {/* Head */}
+        <circle cx="32" cy="16" r="4" fill="#7c3aed" />
+        {/* Eyes */}
+        <circle cx="30" cy="15" r="1.2" fill="white" />
+        <circle cx="34" cy="15" r="1.2" fill="white" />
+        <circle cx="30" cy="15" r="0.6" fill="#1a1a1a" />
+        <circle cx="34" cy="15" r="0.6" fill="#1a1a1a" />
+        {/* Antennae */}
+        <path d="M30 13 Q26 4 22 2" fill="none" stroke="#7c3aed" strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="22" cy="2" r="1.5" fill="#c084fc" />
+        <path d="M34 13 Q38 4 42 2" fill="none" stroke="#7c3aed" strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="42" cy="2" r="1.5" fill="#c084fc" />
+        {/* Wing spots */}
+        <circle cx="14" cy="20" r="2" fill="#a855f7" opacity="0.5" />
+        <circle cx="50" cy="20" r="2" fill="#a855f7" opacity="0.5" />
+      </svg>
+    </div>
+  )
+}
+
+function Messages({ messages, isZoeMode }: { messages: Array<{ id: string; role: string; parts: Array<{ type: string; content?: string }> }>; isZoeMode: boolean }) {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -72,7 +114,7 @@ function Messages({ messages }: { messages: Array<{ id: string; role: string; pa
               className={`flex items-end gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'} ${message.role === 'assistant' && hasCupcakKeMention(textContent) ? 'bunny-wild' : ''}`}
             >
               {message.role === 'assistant' ? (
-                <BunnyAvatar />
+                isZoeMode ? <ButterflyAvatar /> : <BunnyAvatar />
               ) : (
                 <div className="user-avatar">You</div>
               )}
@@ -104,23 +146,36 @@ function Home() {
     })
   }, [chat.messages])
 
+  const isZoeMode = useMemo(() => {
+    return chat.messages.some((m: any) => {
+      if (m.role !== 'user') return false
+      const text = m.parts
+        ?.filter((p: any) => p.type === 'text')
+        .map((p: any) => p.content)
+        .join('') || ''
+      return hasTaylorLikesMention(text)
+    })
+  }, [chat.messages])
+
   return (
     <div className="chat-container">
       {/* Header */}
-      <div className={`chat-header ${isCupcakKeMode ? 'bunny-wild' : ''}`}>
-        <BunnyAvatar />
+      <div className={`chat-header ${isZoeMode ? 'chat-header-butterfly' : ''} ${isCupcakKeMode ? 'bunny-wild' : ''}`}>
+        {isZoeMode ? <ButterflyAvatar /> : <BunnyAvatar />}
         <div className="chat-header-info">
-          <h1 className="chat-header-name">Bun Bun</h1>
+          <h1 className="chat-header-name">{isZoeMode ? 'Zoë' : 'Bun Bun'}</h1>
           <span className="chat-header-status">
             {isCupcakKeMode
               ? '🎵 CUPCAKKE MODE • going absolutely feral 🎵'
-              : isStreaming ? 'thumping...' : 'online • munching hay'}
+              : isZoeMode
+                ? isStreaming ? 'fluttering...' : 'online • landing on flowers'
+                : isStreaming ? 'thumping...' : 'online • munching hay'}
           </span>
         </div>
       </div>
 
       {/* Messages area */}
-      <div className="chat-messages-area">
+      <div className={`chat-messages-area ${isZoeMode ? 'chat-messages-area-butterfly' : ''}`}>
         {chat.messages.length === 0 && (
           <div className="chat-empty-state">
             <div className={`chat-empty-bunny ${hasCupcakKeMention(input) ? 'bunny-wild-idle' : ''}`}>
@@ -146,10 +201,10 @@ function Home() {
             </p>
           </div>
         )}
-        <Messages messages={chat.messages as Array<{ id: string; role: string; parts: Array<{ type: string; content?: string }> }>} />
+        <Messages messages={chat.messages as Array<{ id: string; role: string; parts: Array<{ type: string; content?: string }> }>} isZoeMode={isZoeMode} />
         {isStreaming && (
           <div className="typing-indicator">
-            <BunnyAvatar />
+            {isZoeMode ? <ButterflyAvatar /> : <BunnyAvatar />}
             <div className="typing-dots">
               <span></span>
               <span></span>
@@ -175,7 +230,7 @@ function Home() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Say something to Bun Bun..."
+              placeholder={isZoeMode ? "Say something to Zoë..." : "Say something to Bun Bun..."}
               className="chat-input"
               disabled={isStreaming}
             />
