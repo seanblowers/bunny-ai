@@ -3,10 +3,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Send, Square } from 'lucide-react'
 import { useAIChat } from '@/lib/ai-hook'
 
-function hasCupcakKeMention(text: string): boolean {
-  return /cupcakke/i.test(text)
-}
-
 function hasTaylorLikesMention(text: string): boolean {
   return /taylor\s+likes/i.test(text)
 }
@@ -111,7 +107,7 @@ function Messages({ messages, isZoeMode }: { messages: Array<{ id: string; role:
           return (
             <div
               key={message.id}
-              className={`flex items-end gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'} ${message.role === 'assistant' && hasCupcakKeMention(textContent) ? 'bunny-wild' : ''}`}
+              className={`flex items-end gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
             >
               {message.role === 'assistant' ? (
                 isZoeMode ? <ButterflyAvatar /> : <BunnyAvatar />
@@ -136,16 +132,6 @@ function Home() {
   const chat = useAIChat()
   const isStreaming = chat.status === 'streaming'
 
-  const isCupcakKeMode = useMemo(() => {
-    return chat.messages.some((m: any) => {
-      const text = m.parts
-        ?.filter((p: any) => p.type === 'text')
-        .map((p: any) => p.content)
-        .join('') || ''
-      return hasCupcakKeMention(text)
-    })
-  }, [chat.messages])
-
   const isZoeMode = useMemo(() => {
     return chat.messages.some((m: any) => {
       if (m.role !== 'user') return false
@@ -160,16 +146,14 @@ function Home() {
   return (
     <div className="chat-container">
       {/* Header */}
-      <div className={`chat-header ${isZoeMode ? 'chat-header-butterfly' : ''} ${isCupcakKeMode ? 'bunny-wild' : ''}`}>
+      <div className={`chat-header ${isZoeMode ? 'chat-header-butterfly' : ''}`}>
         {isZoeMode ? <ButterflyAvatar /> : <BunnyAvatar />}
         <div className="chat-header-info">
           <h1 className="chat-header-name">{isZoeMode ? 'Zoë' : 'Bun Bun'}</h1>
           <span className="chat-header-status">
-            {isCupcakKeMode
-              ? '🎵 CUPCAKKE MODE • going absolutely feral 🎵'
-              : isZoeMode
-                ? isStreaming ? 'fluttering...' : 'online • landing on flowers'
-                : isStreaming ? 'thumping...' : 'online • munching hay'}
+            {isZoeMode
+              ? isStreaming ? 'fluttering...' : 'online • landing on flowers'
+              : isStreaming ? 'thumping...' : 'online • munching hay'}
           </span>
         </div>
       </div>
@@ -178,7 +162,7 @@ function Home() {
       <div className={`chat-messages-area ${isZoeMode ? 'chat-messages-area-butterfly' : ''}`}>
         {chat.messages.length === 0 && (
           <div className="chat-empty-state">
-            <div className={`chat-empty-bunny ${hasCupcakKeMention(input) ? 'bunny-wild-idle' : ''}`}>
+            <div className="chat-empty-bunny">
               <svg viewBox="0 0 64 64" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="22" cy="14" rx="7" ry="14" fill="#fce4ec" stroke="#f8bbd0" strokeWidth="1.5" />
                 <ellipse cx="22" cy="14" rx="4" ry="10" fill="#f8bbd0" />
