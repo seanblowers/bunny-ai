@@ -3,3 +3,6 @@
 CLAUDE.local.md
 AGENTS.local.md
 node_modules
+
+# Local Netlify folder
+.netlify

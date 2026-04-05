@@ -253,6 +253,12 @@ function Home() {
             )}
           </div>
         </form>
+        <p className="recaptcha-disclosure">
+          Protected by reCAPTCHA —{' '}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Privacy</a>
+          {' & '}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer">Terms</a>
+        </p>
       </div>
     </div>
   )
