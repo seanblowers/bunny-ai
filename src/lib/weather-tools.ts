@@ -18,7 +18,8 @@ export const getWeatherToolDef = toolDefinition({
 })
 
 // Server implementation - mock weather data
-export const getWeather = getWeatherToolDef.server(({ city }) => {
+export const getWeather = getWeatherToolDef.server((args) => {
+  const { city } = args as { city: string }
   // Mock weather data - in a real app, call a weather API
   const conditions = ['sunny', 'cloudy', 'rainy', 'partly cloudy', 'windy']
   return {
