@@ -29,7 +29,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <Scripts />
-        <script src="https://www.google.com/recaptcha/api.js?render=6Ld8_pksAAAAALv2qpW4VKcwQMV5gXyCdG85A8GE" async defer />
       </body>
     </html>
   )
