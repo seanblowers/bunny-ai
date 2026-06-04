@@ -156,6 +156,14 @@ function Home() {
               : isStreaming ? 'thumping...' : 'online • munching hay'}
           </span>
         </div>
+        <a
+          href="https://blowerscreative.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="chat-header-credit"
+        >
+          Designed by Blowers Creative
+        </a>
       </div>
 
       {/* Messages area */}

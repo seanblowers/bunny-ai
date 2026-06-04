@@ -54,6 +54,25 @@ body {
   opacity: 0.8;
 }
 
+.chat-header-credit {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ad1457;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.chat-header-credit:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.chat-header-butterfly .chat-header-credit {
+  color: #7c3aed;
+}
+
 /* Avatar */
 .bunny-avatar, .butterfly-avatar {
   width: 40px;
